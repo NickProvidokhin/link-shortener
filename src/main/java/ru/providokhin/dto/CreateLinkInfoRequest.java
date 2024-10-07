@@ -15,5 +15,5 @@ public class CreateLinkInfoRequest {
     private String link;
     private LocalDateTime endTime;
     private String description;
-    private boolean activate;
+    private Boolean activate;
 }

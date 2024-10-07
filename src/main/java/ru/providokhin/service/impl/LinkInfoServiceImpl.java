@@ -7,12 +7,12 @@ import ru.providokhin.service.LinkInfoService;
 import java.util.HashMap;
 
 public class LinkInfoServiceImpl implements LinkInfoService {
+    HashMap<String, CreateLinkInfoRequest> linkInfoRequestHashMap = new HashMap<>();
+    final int LINK_LENGTH = 10;
 
     @Override
     public String createShortLink(CreateLinkInfoRequest createLinkInfoRequest) {
-        final int linkLength = 10;
-        String shortLink = RandomStringUtils.randomAlphanumeric(linkLength);
-        HashMap<String, CreateLinkInfoRequest> linkInfoRequestHashMap = new HashMap<>();
+        String shortLink = RandomStringUtils.randomAlphanumeric(LINK_LENGTH);
         linkInfoRequestHashMap.put(shortLink, createLinkInfoRequest);
         return shortLink;
     }

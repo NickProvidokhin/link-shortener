@@ -1,10 +1,11 @@
 package ru.providokhin.exception;
 
 public class LinkShortenerException extends RuntimeException {
-    LinkShortenerException(String message){
+    public LinkShortenerException(String message){
         super(message);
     }
-    LinkShortenerException(String message, Exception exception){
+
+    public LinkShortenerException(String message, Exception exception){
         super(message, exception);
     }
 }

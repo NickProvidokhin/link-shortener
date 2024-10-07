@@ -12,7 +12,7 @@ public class LinkInfoServiceImplTest {
         String link = "https://youtube.com";
         LocalDateTime localDateTime = LocalDateTime.now().plusHours(12);
         String description = "Start page of service Youtube";
-        boolean activate = true;
+        Boolean activate = true;
         CreateLinkInfoRequest createLinkInfoRequest = new CreateLinkInfoRequest(link, localDateTime, description, activate);
         LinkInfoServiceImpl linkInfoService = new LinkInfoServiceImpl();
 
