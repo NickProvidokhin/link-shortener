@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
-    Map<String, LinkInfo> storage = new ConcurrentHashMap<>();
+    private final Map<String, LinkInfo> storage = new ConcurrentHashMap<>();
 
     @Override
     public LinkInfo save(LinkInfo linkInfo) {
