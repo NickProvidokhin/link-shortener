@@ -1,25 +1,34 @@
 package ru.providokhin.service.impl;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.providokhin.dto.CreateLinkInfoRequest;
 import ru.providokhin.dto.LinkInfoResponse;
+import ru.providokhin.dto.UpdateLinkInfoRequest;
 import ru.providokhin.exception.NotFoundException;
+import ru.providokhin.property.LinkShortenerProperty;
+import ru.providokhin.repository.LinkInfoRepository;
 import ru.providokhin.repository.impl.LinkInfoRepositoryImpl;
 import ru.providokhin.service.LinkInfoService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.providokhin.util.Constants.LINK_LENGTH;
 
+@SpringBootTest
 public class LinkInfoServiceImplTest {
 
-    LinkInfoService linkInfoService = new LinkInfoServiceImpl(new LinkInfoRepositoryImpl());
+    @Autowired
+    private LinkInfoService linkInfoService;
+
+    @Autowired
+    private LinkShortenerProperty linkShortenerProperty;
 
     @Test
-    public void testGenerateShortLink() {
-
+    public void whenGenerateShortLinkThenSuccess() {
         String link = "https://youtube.com";
         LocalDateTime localDateTime = LocalDateTime.now().plusHours(12);
         String description = "Start page of service Youtube";
@@ -27,25 +36,31 @@ public class LinkInfoServiceImplTest {
         CreateLinkInfoRequest createLinkInfoRequest = new CreateLinkInfoRequest(link, localDateTime, description, activate);
 
         LinkInfoResponse linkInfoResponse = linkInfoService.createLinkInfo(createLinkInfoRequest);
-        System.out.println("Short link: " + linkInfoResponse);
 
+        assertNotNull(linkInfoResponse);
     }
 
     @Test
-    void when_createShortLink_then_success() {
+    void whenCreateShortLinkThenSuccess() {
         CreateLinkInfoRequest request = CreateLinkInfoRequest.builder()
                 .link("http://google.com")
                 .build();
 
         LinkInfoResponse response = linkInfoService.createLinkInfo(request);
-        assertEquals(LINK_LENGTH, response.getShortLink().length());
+        assertEquals(linkShortenerProperty.getShortLinkLength(), response.getShortLink().length());
 
         LinkInfoResponse byShortLink = linkInfoService.getByShortLink((response.getShortLink()));
         assertNotNull(byShortLink);
     }
 
     @Test
-    void when_FindByFilter_then_success() {
+    void whenFindByFilterThenSuccess() {
+
+        LinkInfoService linkInfoServiceLoggingProxy = initForTests();
+
+        //LinkInfoService linkInfoServiceLoggingProxy = new LinkInfoServiceLoggingProxy(linkShortenerProperty);
+        //Если сделать так то дублируется лог
+
         CreateLinkInfoRequest firstRequest = CreateLinkInfoRequest.builder()
                 .link("http://google.com")
                 .description("google start page")
@@ -62,16 +77,16 @@ public class LinkInfoServiceImplTest {
                 .endTime(LocalDateTime.now().plusDays(3))
                 .build();
 
-        linkInfoService.createLinkInfo(firstRequest);
-        linkInfoService.createLinkInfo(secondRequest);
-        linkInfoService.createLinkInfo(thirdRequest);
+        linkInfoServiceLoggingProxy.createLinkInfo(firstRequest);
+        linkInfoServiceLoggingProxy.createLinkInfo(secondRequest);
+        linkInfoServiceLoggingProxy.createLinkInfo(thirdRequest);
 
-        List<LinkInfoResponse> listByFindAll = linkInfoService.findByFilter();
+        List<LinkInfoResponse> listByFindAll = linkInfoServiceLoggingProxy.findByFilter();
         assertEquals(3, listByFindAll.size());
     }
 
     @Test
-    void when_getByShortLink_then_fail() {
+    void whenGetByShortLinkThenFail() {
         String searchShortLink = "test";
 
         CreateLinkInfoRequest request = CreateLinkInfoRequest.builder()
@@ -86,4 +101,106 @@ public class LinkInfoServiceImplTest {
 
         assertEquals("Не удалось найти по короткой ссылке: test", thrown.getMessage());
     }
+
+    @Test
+    void whenDeleteLinkByIDThenSuccess() {
+        LinkInfoService linkInfoServiceLoggingProxy = initForTests();
+
+        CreateLinkInfoRequest firstRequest = CreateLinkInfoRequest.builder()
+                .link("http://google.com")
+                .description("google start page")
+                .endTime(LocalDateTime.now().plusDays(2))
+                .build();
+        CreateLinkInfoRequest secondRequest = CreateLinkInfoRequest.builder()
+                .link("http://vk.com")
+                .description("vk start page")
+                .endTime(LocalDateTime.now().plusDays(1))
+                .build();
+
+        LinkInfoResponse firstLinkInfoResponse = linkInfoServiceLoggingProxy.createLinkInfo(firstRequest);
+        linkInfoServiceLoggingProxy.createLinkInfo(secondRequest);
+
+        linkInfoServiceLoggingProxy.deleteLinkByID(firstLinkInfoResponse.getId());
+        List<LinkInfoResponse> listByFindAll = linkInfoServiceLoggingProxy.findByFilter();
+        assertEquals(1, listByFindAll.size());
+    }
+
+    @Test
+    void whenDeleteLinkByIDThenFailed() {
+        LinkInfoService linkInfoServiceLoggingProxy = initForTests();
+
+        CreateLinkInfoRequest request = CreateLinkInfoRequest.builder()
+                .link("http://google.com")
+                .description("google start page")
+                .endTime(LocalDateTime.now().plusDays(2))
+                .build();
+        LinkInfoResponse firstLinkInfoResponse = linkInfoServiceLoggingProxy.createLinkInfo(request);
+
+
+        linkInfoServiceLoggingProxy.deleteLinkByID(UUID.randomUUID());
+        List<LinkInfoResponse> listByFindAll = linkInfoServiceLoggingProxy.findByFilter();
+        assertEquals(1, listByFindAll.size());
+    }
+
+    @Test
+    void whenUpdateLinkInfoThenSuccess() {
+        String newLink = "ya.ru";
+        LocalDateTime newEndTime = LocalDateTime.now().plusDays(1);
+        String newDescription = "update google start page";
+        Boolean newActivate = false;
+
+
+        CreateLinkInfoRequest request = CreateLinkInfoRequest.builder()
+                .link("http://google.com")
+                .description("google start page")
+                .endTime(LocalDateTime.now().plusDays(2))
+                .build();
+
+        LinkInfoResponse linkInfoResponseCreate = linkInfoService.createLinkInfo(request);
+
+        UpdateLinkInfoRequest updateRequest = UpdateLinkInfoRequest.builder()
+                .id(linkInfoResponseCreate.getId())
+                .link(newLink)
+                .endTime(newEndTime)
+                .description(newDescription)
+                .activate(newActivate)
+                .build();
+        LinkInfoResponse linkInfoResponseUpdate = linkInfoService.updateLinkInfo(updateRequest);
+
+        assertEquals(linkInfoResponseCreate.getId(), linkInfoResponseUpdate.getId());
+        assertEquals(newLink, linkInfoResponseUpdate.getLink());
+        assertEquals(newEndTime, linkInfoResponseUpdate.getEndTime());
+        assertEquals(newActivate, linkInfoResponseUpdate.getActivate());
+        assertEquals(newDescription, linkInfoResponseUpdate.getDescription());
+
+    }
+
+    @Test
+    void whenUpdateLinkInfoThenFailed() {
+
+        CreateLinkInfoRequest request = CreateLinkInfoRequest.builder()
+                .link("http://google.com")
+                .description("google start page")
+                .endTime(LocalDateTime.now().plusDays(2))
+                .build();
+        UpdateLinkInfoRequest updateRequest = UpdateLinkInfoRequest.builder()
+                .id(UUID.randomUUID())
+                .link("http://vk.com")
+                .description("vk start page")
+                .endTime(LocalDateTime.now().plusDays(1))
+                .build();
+
+        linkInfoService.createLinkInfo(request);
+
+        NotFoundException thrown = assertThrows(NotFoundException.class, () -> linkInfoService.updateLinkInfo(updateRequest));
+
+        assertEquals("Не удалось найти сущность для обновления по id", thrown.getMessage());
+    }
+
+    private LinkInfoServiceLoggingProxy initForTests() {
+        LinkInfoRepository repository = new LinkInfoRepositoryImpl();
+        LinkInfoService service = new LinkInfoServiceImpl(repository, linkShortenerProperty);
+        return new LinkInfoServiceLoggingProxy(service);
+    }
+
 }

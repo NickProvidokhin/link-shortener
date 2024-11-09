@@ -1,28 +1,28 @@
 package ru.providokhin.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import ru.providokhin.dto.CreateLinkInfoRequest;
 import ru.providokhin.dto.LinkInfoResponse;
+import ru.providokhin.dto.UpdateLinkInfoRequest;
 import ru.providokhin.exception.NotFoundException;
 import ru.providokhin.model.LinkInfo;
+import ru.providokhin.property.LinkShortenerProperty;
 import ru.providokhin.repository.LinkInfoRepository;
 import ru.providokhin.service.LinkInfoService;
 
 import java.util.List;
+import java.util.UUID;
 
-import static ru.providokhin.util.Constants.LINK_LENGTH;
-
+@RequiredArgsConstructor
 public class LinkInfoServiceImpl implements LinkInfoService {
 
-    LinkInfoRepository linkInfoRepository;
-
-    public LinkInfoServiceImpl(LinkInfoRepository linkInfoRepository) {
-        this.linkInfoRepository = linkInfoRepository;
-    }
+    private final LinkInfoRepository linkInfoRepository;
+    private final LinkShortenerProperty linkShortenerProperty;
 
     @Override
     public LinkInfoResponse createLinkInfo(CreateLinkInfoRequest request) {
-        String shortLink = RandomStringUtils.randomAlphanumeric(LINK_LENGTH);
+        String shortLink = RandomStringUtils.randomAlphanumeric(linkShortenerProperty.getShortLinkLength());
         LinkInfo linkInfo = LinkInfo.builder()
                 .shortLink(shortLink)
                 .link(request.getLink())
@@ -48,6 +48,29 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         return linkInfoRepository.findAll().stream()
                 .map(it -> toResponse(it))
                 .toList();
+    }
+
+    public void deleteLinkByID(UUID id){
+        linkInfoRepository.deleteLinkById(id);
+    }
+    public LinkInfoResponse updateLinkInfo(UpdateLinkInfoRequest request){
+        LinkInfo linkUpdateInfo = linkInfoRepository.findById(request.getId())
+                .orElseThrow(()-> new NotFoundException("Не удалось найти сущность для обновления по id"));
+
+        if (request.getLink()!=null){
+            linkUpdateInfo.setLink(request.getLink());
+        }
+        if (request.getEndTime()!=null){
+            linkUpdateInfo.setEndTime(request.getEndTime());
+        }
+        if (request.getDescription()!=null){
+            linkUpdateInfo.setDescription(request.getDescription());
+        }
+        if (request.getActivate()!=null){
+            linkUpdateInfo.setActivate(request.getActivate());
+        }
+
+        return toResponse(linkUpdateInfo);
     }
 
     private LinkInfoResponse toResponse(LinkInfo linkInfo) {
