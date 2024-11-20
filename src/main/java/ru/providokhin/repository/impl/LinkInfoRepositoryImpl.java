@@ -43,7 +43,7 @@ public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
     @Override
     public void deleteLinkById(UUID id) {
-        Optional<LinkInfo> findById = findById(id);
-        findById.ifPresent(it -> storage.remove(it.getShortLink()));
+        findById(id).
+                ifPresent(it -> storage.remove(it.getShortLink()));
     }
 }

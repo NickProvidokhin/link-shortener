@@ -28,7 +28,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
                 .link(request.getLink())
                 .description(request.getDescription())
                 .endTime(request.getEndTime())
-                .activate(request.getActivate())
+                .active(request.getActive())
                 .openingCount(0L)
                 .build();
         LinkInfo saveLinkInfo = linkInfoRepository.save(linkInfo);
@@ -50,24 +50,25 @@ public class LinkInfoServiceImpl implements LinkInfoService {
                 .toList();
     }
 
-    public void deleteLinkByID(UUID id){
+    public void deleteLinkByID(UUID id) {
         linkInfoRepository.deleteLinkById(id);
     }
-    public LinkInfoResponse updateLinkInfo(UpdateLinkInfoRequest request){
-        LinkInfo linkUpdateInfo = linkInfoRepository.findById(request.getId())
-                .orElseThrow(()-> new NotFoundException("Не удалось найти сущность для обновления по id"));
 
-        if (request.getLink()!=null){
+    public LinkInfoResponse updateLinkInfo(UpdateLinkInfoRequest request) {
+        LinkInfo linkUpdateInfo = linkInfoRepository.findById(request.getId())
+                .orElseThrow(() -> new NotFoundException("Не удалось найти сущность для обновления по id"));
+
+        if (request.getLink() != null) {
             linkUpdateInfo.setLink(request.getLink());
         }
-        if (request.getEndTime()!=null){
+        if (request.getEndTime() != null) {
             linkUpdateInfo.setEndTime(request.getEndTime());
         }
-        if (request.getDescription()!=null){
+        if (request.getDescription() != null) {
             linkUpdateInfo.setDescription(request.getDescription());
         }
-        if (request.getActivate()!=null){
-            linkUpdateInfo.setActivate(request.getActivate());
+        if (request.getActive() != null) {
+            linkUpdateInfo.setActive(request.getActive());
         }
 
         return toResponse(linkUpdateInfo);
@@ -81,7 +82,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
                 .shortLink(linkInfo.getShortLink())
                 .endTime(linkInfo.getEndTime())
                 .description(linkInfo.getDescription())
-                .activate(linkInfo.getActivate())
+                .active(linkInfo.getActive())
                 .build();
     }
 }

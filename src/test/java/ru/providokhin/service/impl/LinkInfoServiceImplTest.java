@@ -32,8 +32,8 @@ public class LinkInfoServiceImplTest {
         String link = "https://youtube.com";
         LocalDateTime localDateTime = LocalDateTime.now().plusHours(12);
         String description = "Start page of service Youtube";
-        boolean activate = true;
-        CreateLinkInfoRequest createLinkInfoRequest = new CreateLinkInfoRequest(link, localDateTime, description, activate);
+        boolean active = true;
+        CreateLinkInfoRequest createLinkInfoRequest = new CreateLinkInfoRequest(link, localDateTime, description, active);
 
         LinkInfoResponse linkInfoResponse = linkInfoService.createLinkInfo(createLinkInfoRequest);
 
@@ -147,7 +147,7 @@ public class LinkInfoServiceImplTest {
         String newLink = "ya.ru";
         LocalDateTime newEndTime = LocalDateTime.now().plusDays(1);
         String newDescription = "update google start page";
-        Boolean newActivate = false;
+        Boolean newActive = false;
 
 
         CreateLinkInfoRequest request = CreateLinkInfoRequest.builder()
@@ -163,14 +163,14 @@ public class LinkInfoServiceImplTest {
                 .link(newLink)
                 .endTime(newEndTime)
                 .description(newDescription)
-                .activate(newActivate)
+                .active(newActive)
                 .build();
         LinkInfoResponse linkInfoResponseUpdate = linkInfoService.updateLinkInfo(updateRequest);
 
         assertEquals(linkInfoResponseCreate.getId(), linkInfoResponseUpdate.getId());
         assertEquals(newLink, linkInfoResponseUpdate.getLink());
         assertEquals(newEndTime, linkInfoResponseUpdate.getEndTime());
-        assertEquals(newActivate, linkInfoResponseUpdate.getActivate());
+        assertEquals(newActive, linkInfoResponseUpdate.getActive());
         assertEquals(newDescription, linkInfoResponseUpdate.getDescription());
 
     }

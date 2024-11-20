@@ -17,5 +17,5 @@ public class UpdateLinkInfoRequest {
     private String link;
     private LocalDateTime endTime;
     private String description;
-    private Boolean activate;
+    private Boolean active;
 }
