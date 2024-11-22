@@ -1,6 +1,10 @@
 package ru.providokhin.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -18,7 +22,7 @@ public class LinkInfo {
     private String link;
     private LocalDateTime endTime;
     private String description;
-    private Boolean activate;
+    private Boolean active;
 
     @Override
     public boolean equals(Object o) {

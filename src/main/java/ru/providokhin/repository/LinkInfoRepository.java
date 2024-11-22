@@ -4,12 +4,17 @@ import ru.providokhin.model.LinkInfo;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface LinkInfoRepository {
 
-    public LinkInfo save(LinkInfo linkInfo);
+    LinkInfo save(LinkInfo linkInfo);
 
-    public Optional<LinkInfo> findByShortLink(String shortLink);
+    Optional<LinkInfo> findByShortLink(String shortLink);
 
-    public List<LinkInfo> findAll();
+    List<LinkInfo> findAll();
+
+    Optional<LinkInfo> findById(UUID id);
+
+    void deleteLinkById(UUID id);
 }
