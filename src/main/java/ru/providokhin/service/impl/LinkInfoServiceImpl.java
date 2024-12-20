@@ -45,7 +45,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @Override
     @LogExecutionTime
     public LinkInfoResponse getByShortLink(String shortLink) {
-        return linkInfoRepository.findByShortLink(shortLink)
+        return linkInfoRepository.findByShortLinkAndCheckTimeAndActive(shortLink)
                 .map(it -> toResponse(it))
                 .orElseThrow(() -> new NotFoundException("Не удалось найти по короткой ссылке: " + shortLink));
     }
@@ -82,6 +82,8 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         if (request.getActive() != null) {
             linkUpdateInfo.setActive(request.getActive());
         }
+
+        LinkInfo saveLinkInfo = linkInfoRepository.save(linkUpdateInfo);
 
         return toResponse(linkUpdateInfo);
     }

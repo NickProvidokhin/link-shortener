@@ -7,7 +7,6 @@ import ru.providokhin.loggingstarter.LoggingStarterAutoConfiguration;
 @SpringBootApplication
 public class LinkShortenerApp {
     public static void main(String[] args) {
-        LoggingStarterAutoConfiguration.println("It's working!!! Wow!");
         SpringApplication.run(LinkShortenerApp.class, args);
     }
 }

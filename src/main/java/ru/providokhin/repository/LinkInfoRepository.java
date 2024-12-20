@@ -17,4 +17,7 @@ public interface LinkInfoRepository {
     Optional<LinkInfo> findById(UUID id);
 
     void deleteLinkById(UUID id);
+
+    Optional<LinkInfo> findByShortLinkAndCheckTimeAndActive(String shortLink);
+
 }

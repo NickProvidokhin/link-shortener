@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 import ru.providokhin.model.LinkInfo;
 import ru.providokhin.repository.LinkInfoRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +18,9 @@ public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
     @Override
     public LinkInfo save(LinkInfo linkInfo) {
-        linkInfo.setId(UUID.randomUUID());
+        if (linkInfo.getId() == null) {
+            linkInfo.setId(UUID.randomUUID());
+        }
 
         storage.put(linkInfo.getShortLink(), linkInfo);
 
@@ -45,5 +48,11 @@ public class LinkInfoRepositoryImpl implements LinkInfoRepository {
     public void deleteLinkById(UUID id) {
         findById(id).
                 ifPresent(it -> storage.remove(it.getShortLink()));
+    }
+
+    @Override
+    public  Optional<LinkInfo> findByShortLinkAndCheckTimeAndActive(String shortLink){
+        return Optional.ofNullable(storage.get(shortLink))
+                .filter(it -> it.getActive() && it.getEndTime().isAfter(LocalDateTime.now()));
     }
 }
