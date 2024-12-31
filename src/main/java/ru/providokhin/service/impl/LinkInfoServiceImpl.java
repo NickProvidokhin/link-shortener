@@ -14,6 +14,7 @@ import ru.providokhin.property.LinkShortenerProperty;
 import ru.providokhin.repository.LinkInfoRepository;
 import ru.providokhin.service.LinkInfoService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +46,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @Override
     @LogExecutionTime
     public LinkInfoResponse getByShortLink(String shortLink) {
-        return linkInfoRepository.findByShortLinkAndCheckTimeAndActive(shortLink)
+        return linkInfoRepository.findByShortLinkAndCheckTimeAndActive(shortLink, LocalDateTime.now())
                 .map(it -> toResponse(it))
                 .orElseThrow(() -> new NotFoundException("Не удалось найти по короткой ссылке: " + shortLink));
     }

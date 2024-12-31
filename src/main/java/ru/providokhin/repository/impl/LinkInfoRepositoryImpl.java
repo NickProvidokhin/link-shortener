@@ -51,8 +51,8 @@ public class LinkInfoRepositoryImpl implements LinkInfoRepository {
     }
 
     @Override
-    public  Optional<LinkInfo> findByShortLinkAndCheckTimeAndActive(String shortLink){
+    public  Optional<LinkInfo> findByShortLinkAndCheckTimeAndActive(String shortLink, LocalDateTime localDateTime){
         return Optional.ofNullable(storage.get(shortLink))
-                .filter(it -> it.getActive() && it.getEndTime().isAfter(LocalDateTime.now()));
+                .filter(it -> it.getActive() && it.getEndTime().isAfter(localDateTime));
     }
 }
