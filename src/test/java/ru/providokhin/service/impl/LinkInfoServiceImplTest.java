@@ -44,6 +44,8 @@ public class LinkInfoServiceImplTest {
     void whenCreateShortLinkThenSuccess() {
         CreateLinkInfoRequest request = CreateLinkInfoRequest.builder()
                 .link("http://google.com")
+                .active(true)
+                .endTime(LocalDateTime.now().plusDays(1))
                 .build();
 
         LinkInfoResponse response = linkInfoService.createLinkInfo(request);
