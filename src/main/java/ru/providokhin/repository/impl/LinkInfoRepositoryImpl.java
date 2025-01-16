@@ -1,5 +1,6 @@
 package ru.providokhin.repository.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.providokhin.model.LinkInfo;
 import ru.providokhin.repository.LinkInfoRepository;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Repository
 public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
@@ -47,11 +49,12 @@ public class LinkInfoRepositoryImpl implements LinkInfoRepository {
     @Override
     public void deleteLinkById(UUID id) {
         findById(id).
-                ifPresent(it -> storage.remove(it.getShortLink()));
+                ifPresentOrElse(it -> storage.remove(it.getShortLink()),
+                        () -> log.info("Не удалось найти сущность по id: {}", id));
     }
 
     @Override
-    public  Optional<LinkInfo> findByShortLinkAndCheckTimeAndActive(String shortLink, LocalDateTime localDateTime){
+    public Optional<LinkInfo> findByShortLinkAndCheckTimeAndActive(String shortLink, LocalDateTime localDateTime) {
         return Optional.ofNullable(storage.get(shortLink))
                 .filter(it -> it.getActive() && it.getEndTime().isAfter(localDateTime));
     }

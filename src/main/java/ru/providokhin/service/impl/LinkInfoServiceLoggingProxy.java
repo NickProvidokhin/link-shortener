@@ -10,6 +10,7 @@ import ru.providokhin.service.LinkInfoService;
 import java.util.List;
 import java.util.UUID;
 
+@Deprecated
 @Slf4j
 public class LinkInfoServiceLoggingProxy implements LinkInfoService {
 
