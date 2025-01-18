@@ -7,6 +7,7 @@ import ru.providokhin.dto.CreateLinkInfoRequest;
 import ru.providokhin.dto.LinkInfoResponse;
 import ru.providokhin.dto.UpdateLinkInfoRequest;
 import ru.providokhin.exception.NotFoundException;
+import ru.providokhin.mapper.LinkInfoMapper;
 import ru.providokhin.property.LinkShortenerProperty;
 import ru.providokhin.repository.LinkInfoRepository;
 import ru.providokhin.repository.impl.LinkInfoRepositoryImpl;
@@ -26,6 +27,9 @@ public class LinkInfoServiceImplTest {
 
     @Autowired
     private LinkShortenerProperty linkShortenerProperty;
+
+    @Autowired
+    private LinkInfoMapper linkInfoMapper;
 
     @Test
     public void whenGenerateShortLinkThenSuccess() {
@@ -58,7 +62,7 @@ public class LinkInfoServiceImplTest {
     @Test
     void whenFindByFilterThenSuccess() {
 
-        LinkInfoService linkInfoServiceLoggingProxy = initForTests();
+        LinkInfoService service = initForTests();
 
         //LinkInfoService linkInfoServiceLoggingProxy = new LinkInfoServiceLoggingProxy(linkShortenerProperty);
         //Если сделать так то дублируется лог
@@ -79,11 +83,11 @@ public class LinkInfoServiceImplTest {
                 .endTime(LocalDateTime.now().plusDays(3))
                 .build();
 
-        linkInfoServiceLoggingProxy.createLinkInfo(firstRequest);
-        linkInfoServiceLoggingProxy.createLinkInfo(secondRequest);
-        linkInfoServiceLoggingProxy.createLinkInfo(thirdRequest);
+        service.createLinkInfo(firstRequest);
+        service.createLinkInfo(secondRequest);
+        service.createLinkInfo(thirdRequest);
 
-        List<LinkInfoResponse> listByFindAll = linkInfoServiceLoggingProxy.findByFilter();
+        List<LinkInfoResponse> listByFindAll = service.findByFilter();
         assertEquals(3, listByFindAll.size());
     }
 
@@ -161,7 +165,7 @@ public class LinkInfoServiceImplTest {
         LinkInfoResponse linkInfoResponseCreate = linkInfoService.createLinkInfo(request);
 
         UpdateLinkInfoRequest updateRequest = UpdateLinkInfoRequest.builder()
-                .id(linkInfoResponseCreate.getId())
+                .id(linkInfoResponseCreate.getId().toString())
                 .link(newLink)
                 .endTime(newEndTime)
                 .description(newDescription)
@@ -186,7 +190,7 @@ public class LinkInfoServiceImplTest {
                 .endTime(LocalDateTime.now().plusDays(2))
                 .build();
         UpdateLinkInfoRequest updateRequest = UpdateLinkInfoRequest.builder()
-                .id(UUID.randomUUID())
+                .id(UUID.randomUUID().toString())
                 .link("http://vk.com")
                 .description("vk start page")
                 .endTime(LocalDateTime.now().plusDays(1))
@@ -199,10 +203,9 @@ public class LinkInfoServiceImplTest {
         assertEquals("Не удалось найти сущность для обновления по id", thrown.getMessage());
     }
 
-    private LinkInfoServiceLoggingProxy initForTests() {
+    private LinkInfoService initForTests() {
         LinkInfoRepository repository = new LinkInfoRepositoryImpl();
-        LinkInfoService service = new LinkInfoServiceImpl(repository, linkShortenerProperty);
-        return new LinkInfoServiceLoggingProxy(service);
+        return new LinkInfoServiceImpl(linkInfoMapper, repository, linkShortenerProperty);
     }
 
 }

@@ -45,7 +45,7 @@ class LinkInfoControllerTest {
         CommonResponse<LinkInfoResponse> createResponse = linkInfoController.postCreateLinkInfo(createRequest);
 
         UpdateLinkInfoRequest updateBody = UpdateLinkInfoRequest.builder()
-                .id(createResponse.getBody().getId())
+                .id(createResponse.getBody().getId().toString())
                 .link("https://google.com")
                 .active(false)
                 .build();
@@ -62,7 +62,7 @@ class LinkInfoControllerTest {
 
         CommonResponse<LinkInfoResponse> createResponse = linkInfoController.postCreateLinkInfo(createRequest);
 
-        CommonResponse<LinkInfoResponse> deleteResponse = linkInfoController.deleteLinkInfo(createResponse.getBody().getId());
+        CommonResponse<LinkInfoResponse> deleteResponse = linkInfoController.deleteLinkInfo(createResponse.getBody().getId().toString());
 
         assertNotNull(deleteResponse.getId());
     }

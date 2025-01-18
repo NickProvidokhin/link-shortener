@@ -1,5 +1,6 @@
 package ru.providokhin.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import ru.providokhin.dto.UpdateLinkInfoRequest;
 import ru.providokhin.dto.common.CommonRequest;
 import ru.providokhin.dto.common.CommonResponse;
 import ru.providokhin.service.LinkInfoService;
+import ru.providokhin.validation.ValidUUID;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +25,7 @@ public class LinkInfoController {
     private final LinkInfoService linkInfoService;
 
     @PostMapping
-    public CommonResponse<LinkInfoResponse> postCreateLinkInfo(@RequestBody CommonRequest<CreateLinkInfoRequest> request) {
+    public CommonResponse<LinkInfoResponse> postCreateLinkInfo(@RequestBody @Valid CommonRequest<CreateLinkInfoRequest> request) {
         log.info("Поступил запрос на создание короткой ссылки: {}", request);
 
         LinkInfoResponse linkInfoResponse = linkInfoService.createLinkInfo(request.getBody());
@@ -38,7 +40,7 @@ public class LinkInfoController {
     }
 
     @PatchMapping
-    public CommonResponse<LinkInfoResponse> patchUpdateLinkInfo(@RequestBody CommonRequest<UpdateLinkInfoRequest> request) {
+    public CommonResponse<LinkInfoResponse> patchUpdateLinkInfo(@RequestBody @Valid CommonRequest<UpdateLinkInfoRequest> request) {
         log.info("Поступил запрос на обновление информации о ссылке: {}", request);
 
         LinkInfoResponse linkInfoResponse = linkInfoService.updateLinkInfo(request.getBody());
@@ -52,10 +54,10 @@ public class LinkInfoController {
     }
 
     @DeleteMapping("/{id}")
-    public CommonResponse<LinkInfoResponse> deleteLinkInfo(@PathVariable UUID id) {
+    public CommonResponse<LinkInfoResponse> deleteLinkInfo(@PathVariable @ValidUUID String id) {
         log.info("Поступил запрос на удаление короткой ссылки: {}", id);
 
-        linkInfoService.deleteLinkByID(id);
+        linkInfoService.deleteLinkByID(UUID.fromString(id));
 
         log.info("Короткая ссылка успешно удалена: {}", id);
 
@@ -77,6 +79,4 @@ public class LinkInfoController {
                 .body(linkInfoResponseList)
                 .build();
     }
-
-
 }
